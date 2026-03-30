@@ -10,6 +10,16 @@ def log(msg):
     print(f"[{datetime.now().strftime('%H:%M:%S')}] LOAD | {msg}")
 
 
+import re
+
+
+def _validate_identifier(name):
+    """Validate Snowflake identifier to prevent SQL injection."""
+    if not re.match(r'^[a-zA-Z_][a-zA-Z0-9_]*$', name):
+        raise ValueError(f"Invalid Snowflake identifier: {name}")
+    return name
+
+
 def get_connection():
     """Get snowflake connection.
     Snowflake connector is picky about None values in the config dict —
@@ -27,6 +37,7 @@ def create_staging_table(conn, table_name, df):
     """Create a staging table based on dataframe schema.
     We prefix staging tables with STG_ so they're easy to identify and cleanup.
     """
+    _validate_identifier(table_name)
     stg_name = f"STG_{table_name.upper()}"
 
     # map pandas dtypes to snowflake types

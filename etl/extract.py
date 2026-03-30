@@ -61,12 +61,21 @@ def extract_postgres(query, table_name=None):
         conn.close()
 
 
+def _validate_table_name(table_name):
+    """Validate table name to prevent SQL injection."""
+    import re
+    if not re.match(r'^[a-zA-Z_][a-zA-Z0-9_.]*$', table_name):
+        raise ValueError(f"Invalid table name: {table_name}")
+    return table_name
+
+
 def extract_postgres_table(table_name, where_clause=None):
     """Convenience wrapper — most of the time we just want the whole table.
     Be careful with big tables though, no LIMIT here on purpose because
     we usually want everything for the warehouse.
     """
-    query = f"SELECT * FROM {table_name}"
+    safe_name = _validate_table_name(table_name)
+    query = f"SELECT * FROM {safe_name}"
     if where_clause:
         query += f" WHERE {where_clause}"
     return extract_postgres(query, table_name)
