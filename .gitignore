@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+eggs/
+*.egg
+
+# Virtual env
+venv/
+.venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment
+.env
+.env.local
+
+# Data files — don't commit raw data
+data/
+*.csv
+*.parquet
+*.json.gz
+
+# Logs
+logs/
+*.log
+
+# Snowflake staging
+snowflake_stage/
