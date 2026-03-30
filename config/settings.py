@@ -7,7 +7,7 @@ load_dotenv()
 # learned this the hard way at Nagarro when half our loads failed silently
 
 SNOWFLAKE_CONFIG = {
-    "account": os.getenv("SNOWFLAKE_ACCOUNT", ""),
+    "account": os.getenv("SNOWFLAKE_ACCOUNT"),
     "user": os.getenv("SNOWFLAKE_USER"),
     "password": os.getenv("SNOWFLAKE_PASSWORD"),
     "database": os.getenv("SNOWFLAKE_DATABASE", "ANALYTICS_DB"),
@@ -27,7 +27,7 @@ POSTGRES_CONFIG = {
     "host": os.getenv("POSTGRES_HOST", "localhost"),
     "port": int(os.getenv("POSTGRES_PORT", 5432)),
     "dbname": os.getenv("POSTGRES_DB", "source_db"),
-    "user": os.getenv("POSTGRES_USER", "postgres"),
+    "user": os.getenv("POSTGRES_USER"),
     "password": os.getenv("POSTGRES_PASSWORD"),
 }
 
