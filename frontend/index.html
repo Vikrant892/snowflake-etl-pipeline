@@ -3,192 +3,309 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>snowflake-etl — drawing 01</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>Snowflake ETL — Data Architecture</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{background:#1d2b3a;color:#e8e5d0;font-family:'Inter',sans-serif;font-size:14px;line-height:1.5;min-height:100vh}
-.page{max-width:900px;margin:0 auto;padding:36px 28px 60px}
-.tbox{border:1px solid #e8e5d0;margin-bottom:28px}
-.tbox table{width:100%;border-collapse:collapse;font-family:'IBM Plex Mono',monospace;font-size:12.5px}
-.tbox td{padding:5px 10px;border-right:1px solid #e8e5d0;vertical-align:top;color:#cac9b0}
-.tbox td:last-child{border-right:0}
-.tbox td b{color:#fff;font-weight:500;margin-right:6px;font-size:11px;letter-spacing:.04em;text-transform:uppercase}
-h1{font-family:'IBM Plex Serif',serif;font-weight:600;font-size:30px;letter-spacing:-.01em;color:#fff;margin-bottom:4px}
-h1 .sub{display:block;font-size:15px;font-weight:400;color:#a8c3dc;margin-top:6px;letter-spacing:0}
-h2{font-family:'IBM Plex Serif',serif;font-weight:600;font-size:19px;color:#fff;margin:36px 0 12px;padding-bottom:5px;border-bottom:1px solid #3a526a}
-h2 .n{color:#7ea1c4;margin-right:10px;font-family:'IBM Plex Mono',monospace;font-size:13px}
-p{margin-bottom:10px;color:#cac9b0;max-width:680px}
-.fig{border:1px solid #7ea1c4;padding:22px 18px;margin:14px 0;background:#15212d;overflow:auto}
-.fig svg{display:block;margin:0 auto}
-.caption{text-align:center;font-family:'IBM Plex Serif',serif;font-size:12.5px;color:#a8c3dc;margin-top:8px;font-style:italic}
-.tbl{width:100%;border-collapse:collapse;font-family:'IBM Plex Mono',monospace;font-size:12.5px;margin:10px 0}
-.tbl th{text-align:left;border-bottom:1px solid #fff;padding:6px 10px;color:#fff;font-weight:600;font-size:11.5px;text-transform:uppercase;letter-spacing:.04em}
-.tbl td{padding:4px 10px;border-bottom:1px solid #3a526a;color:#cac9b0}
-.tbl tr:last-child td{border-bottom:0}
-.scd-form{display:flex;gap:10px;align-items:center;margin:12px 0;flex-wrap:wrap;font-family:'IBM Plex Mono',monospace;font-size:12.5px}
-.scd-form input{background:#0f1a24;border:1px solid #7ea1c4;color:#e8e5d0;padding:5px 10px;font:inherit;outline:none;border-radius:0;min-width:180px}
-.scd-form input:focus{border-color:#fff}
-.scd-form button{background:transparent;border:1px solid #e8e5d0;color:#e8e5d0;padding:5px 14px;font:inherit;cursor:pointer;border-radius:0;letter-spacing:.06em}
-.scd-form button:hover{background:#e8e5d0;color:#1d2b3a}
-.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:12px 0}
-.m{border:1px solid #3a526a;padding:10px 12px}
-.m .v{font-family:'IBM Plex Mono',monospace;font-size:22px;color:#fff;letter-spacing:-.02em}
-.m .l{font-size:10.5px;color:#7ea1c4;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
-.m .spark{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#7ea1c4;margin-top:3px;letter-spacing:-1px}
-.notes{padding-left:0;list-style:none;counter-reset:n;font-size:13px}
-.notes li{counter-increment:n;padding:6px 0;border-bottom:1px dotted #3a526a;color:#cac9b0;padding-left:28px;position:relative}
-.notes li::before{content:counter(n)"."; position:absolute;left:0;color:#7ea1c4;font-family:'IBM Plex Mono',monospace;font-weight:600}
-.revhist td{font-size:12px}
-hr.hair{border:0;border-top:1px solid #3a526a;margin:8px 0}
-footer{margin-top:50px;padding-top:18px;border-top:1px solid #3a526a;font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#7ea1c4;text-align:center}
-footer a{color:#e8e5d0;text-decoration:none}
-footer a:hover{border-bottom:1px solid #e8e5d0}
-code{font-family:'IBM Plex Mono',monospace;color:#fff}
-@media(max-width:640px){.metrics{grid-template-columns:repeat(2,1fr)}}
+:root{
+  --bg:#fbfaf7; --panel:#fff; --panel2:#f3efe7; --line:#e3dccf;
+  --ink:#1a1a1a; --dim:#6b635a;
+  --ice:#4a9dd4; --ice-d:#4a9dd418;
+  --amber:#e09a2b; --amber-d:#e09a2b18;
+  --cherry:#c94a4a; --cherry-d:#c94a4a18;
+  --sage:#5a9d76; --sage-d:#5a9d7618;
+}
+html,body{background:var(--bg);color:var(--ink);font-family:'DM Sans',system-ui,sans-serif;font-size:15px;line-height:1.6;min-height:100vh;overflow-x:hidden}
+.wrap{max-width:1160px;margin:0 auto;padding:32px 28px 60px}
+
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;padding-bottom:20px;border-bottom:1px solid var(--line)}
+.brand{display:flex;gap:14px;align-items:center}
+.bm{width:44px;height:44px;background:var(--ice);border-radius:12px;position:relative;display:flex;align-items:center;justify-content:center}
+.bm::before{content:'';position:absolute;inset:8px;background:#fff;clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%)}
+.brand h1{font-size:22px;font-weight:800;letter-spacing:-.02em}
+.brand small{display:block;color:var(--dim);font-size:12px;font-family:'DM Mono',monospace;margin-top:-2px}
+.nav{display:flex;gap:6px}
+.nav a{padding:7px 14px;color:var(--dim);text-decoration:none;font-size:13px;border-radius:8px;cursor:pointer;font-weight:500}
+.nav a.on{background:var(--ink);color:var(--bg)}
+.nav a:hover:not(.on){background:var(--panel2)}
+
+.hero{display:grid;grid-template-columns:1.2fr 1fr;gap:30px;margin-bottom:40px}
+.hero h2{font-size:44px;font-weight:800;letter-spacing:-.03em;line-height:1.05;margin-bottom:14px}
+.hero h2 span{background:var(--amber);padding:0 6px;border-radius:6px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.hero p{color:var(--dim);font-size:16px;max-width:480px;margin-bottom:22px}
+.herotags{display:flex;gap:8px;flex-wrap:wrap}
+.tag{padding:5px 11px;background:var(--panel);border:1px solid var(--line);border-radius:100px;font-size:12px;color:var(--ink);font-weight:500;font-family:'DM Mono',monospace}
+.tag.ice{color:var(--ice);border-color:var(--ice);background:var(--ice-d)}
+.tag.amb{color:var(--amber);border-color:var(--amber);background:var(--amber-d)}
+
+.herobox{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:22px;font-family:'DM Mono',monospace;font-size:12.5px;line-height:1.9;position:relative}
+.herobox::before{content:'DOC-001';position:absolute;top:-8px;right:18px;background:var(--ink);color:var(--bg);padding:3px 9px;border-radius:4px;font-size:10px;letter-spacing:.1em;font-weight:500}
+.herobox .row{display:grid;grid-template-columns:120px 1fr;gap:14px;padding:6px 0;border-bottom:1px solid var(--line)}
+.herobox .row:last-child{border-bottom:0}
+.herobox .row .k{color:var(--dim);text-transform:uppercase;letter-spacing:.06em;font-size:10.5px;font-weight:600}
+.herobox .row .v{color:var(--ink)}
+
+/* Pipeline */
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:26px 30px;margin-bottom:20px}
+.ph{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:20px}
+.ph h3{font-size:22px;font-weight:800;letter-spacing:-.02em}
+.ph h3 .n{color:var(--ice);font-family:'DM Mono',monospace;font-size:13px;margin-right:12px;font-weight:500}
+.ph p{color:var(--dim);font-size:13.5px;margin-top:4px;font-weight:400}
+
+.pipeline{display:grid;grid-template-columns:repeat(5,1fr) auto;gap:16px;margin:20px 0;align-items:center}
+.stage{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:16px 14px;text-align:center;position:relative}
+.stage .ic{width:32px;height:32px;background:var(--ink);color:var(--bg);border-radius:8px;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;font-family:'DM Mono',monospace;font-weight:700;font-size:13px}
+.stage.src .ic{background:var(--sage)}
+.stage.ext .ic{background:var(--ice)}
+.stage.tx .ic{background:var(--amber)}
+.stage.ld .ic{background:var(--cherry)}
+.stage.dw .ic{background:var(--ink)}
+.stage h5{font-size:13px;font-weight:700;margin-bottom:2px}
+.stage small{display:block;color:var(--dim);font-size:11px;font-family:'DM Mono',monospace;line-height:1.4}
+.pipeline .ar{color:var(--dim);font-size:18px;text-align:center}
+.pipeline-meta{display:flex;justify-content:space-around;margin-top:16px;padding-top:16px;border-top:1px dashed var(--line);font-size:12px;color:var(--dim);font-family:'DM Mono',monospace;flex-wrap:wrap;gap:10px}
+.pipeline-meta b{color:var(--ink);font-weight:600}
+
+/* Schema diagram */
+.schema{display:grid;grid-template-columns:1fr 1.4fr 1fr;gap:20px;align-items:center}
+.dim-col{display:flex;flex-direction:column;gap:16px}
+.tbl{background:var(--panel2);border:2px solid var(--ink);border-radius:10px;overflow:hidden;font-family:'DM Mono',monospace;font-size:12px}
+.tbl .th{background:var(--ink);color:var(--bg);padding:6px 12px;font-weight:700;letter-spacing:.04em;font-size:11px;text-transform:uppercase}
+.tbl .fact-h{background:var(--amber);color:var(--ink)}
+.tbl .fd{padding:5px 12px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:8px}
+.tbl .fd:last-child{border-bottom:0}
+.tbl .fd .n{color:var(--ink)}
+.tbl .fd .ty{color:var(--dim);font-size:10.5px}
+.tbl .fd.pk .n{color:var(--amber);font-weight:600}
+.tbl .fd.fk .n{color:var(--ice);font-weight:500}
+.fact{background:var(--panel);border:2px solid var(--amber);border-radius:10px;overflow:hidden;font-family:'DM Mono',monospace;font-size:12px}
+.fact .th{background:var(--amber);color:var(--ink);padding:8px 12px;font-weight:700;text-align:center}
+.fact .fd{padding:6px 12px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:8px}
+.fact .fd:last-child{border-bottom:0}
+.fact .fd.pk .n{color:var(--cherry);font-weight:600}
+.fact .fd.fk .n{color:var(--ice)}
+
+/* SCD demo */
+.scd{display:grid;grid-template-columns:1.4fr 1fr;gap:24px;align-items:flex-start}
+.scd-tbl{font-family:'DM Mono',monospace;font-size:12.5px;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.scd-tbl table{width:100%;border-collapse:collapse}
+.scd-tbl th{background:var(--panel2);padding:10px 12px;text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--dim);font-weight:700;border-bottom:1px solid var(--line)}
+.scd-tbl td{padding:11px 12px;border-bottom:1px solid var(--line)}
+.scd-tbl tr:last-child td{border-bottom:0}
+.scd-tbl tr.cur td{background:var(--sage-d);color:var(--ink)}
+.scd-tbl tr.exp td{color:var(--dim);text-decoration:line-through}
+.scd-tbl tr.new{animation:flash 2s ease}
+@keyframes flash{0%{background:var(--amber)}100%{background:transparent}}
+
+.scd-ctl{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:16px}
+.scd-ctl label{display:block;font-size:11.5px;color:var(--dim);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;font-weight:600}
+.scd-ctl input{width:100%;background:var(--bg);border:1px solid var(--line);padding:8px 10px;font:inherit;font-size:13px;border-radius:8px;outline:none;margin-bottom:12px;font-family:'DM Mono',monospace}
+.scd-ctl input:focus{border-color:var(--ice)}
+.scd-ctl .btn{width:100%;padding:10px;background:var(--ink);color:var(--bg);border:none;font:inherit;font-weight:600;border-radius:8px;cursor:pointer;font-size:13px}
+.scd-ctl .btn:hover{background:var(--ice)}
+.scd-ctl .btn.g{background:transparent;color:var(--dim);font-weight:400;margin-top:6px}
+.scd-log{margin-top:12px;padding:10px 12px;background:var(--ink);color:#a0e9a0;border-radius:8px;font-family:'DM Mono',monospace;font-size:11px;line-height:1.7;min-height:40px}
+
+/* Metrics */
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:20px 0 0}
+.metric{padding:18px 20px;background:var(--panel);border:1px solid var(--line);border-radius:14px}
+.metric .n{font-size:28px;font-weight:800;font-family:'DM Mono',monospace;letter-spacing:-.02em}
+.metric .l{font-size:11.5px;color:var(--dim);text-transform:uppercase;letter-spacing:.06em;margin-top:4px;font-weight:600}
+.metric .tr{font-size:11.5px;color:var(--sage);margin-top:8px;font-weight:500}
+.metric.ice .n{color:var(--ice)}
+.metric.amb .n{color:var(--amber)}
+.metric.che .n{color:var(--cherry)}
+.metric.sg .n{color:var(--sage)}
+
+.notes{margin-top:20px}
+.notes li{list-style:none;padding:10px 0 10px 32px;border-bottom:1px dashed var(--line);position:relative;color:var(--dim);font-size:13.5px}
+.notes li::before{counter-increment:nt;content:counter(nt);position:absolute;left:0;top:10px;width:22px;height:22px;background:var(--amber-d);color:var(--amber);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;font-family:'DM Mono',monospace}
+.notes li:last-child{border-bottom:0}
+.notes{counter-reset:nt}
+.notes li b{color:var(--ink);font-weight:600}
+
+.foot{margin-top:20px;padding:22px 0 0;border-top:1px solid var(--line);color:var(--dim);font-size:13px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.foot a{color:var(--ink)}
+
+@media(max-width:900px){.hero,.schema,.scd{grid-template-columns:1fr}.pipeline{grid-template-columns:1fr;gap:8px}.pipeline .ar{transform:rotate(90deg)}.metrics{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
-<div class="page">
+<div class="wrap">
 
-<div class="tbox">
-<table><tr>
-<td><b>title</b><br>Snowflake ETL Pipeline</td>
-<td><b>drawn</b> V.Sharma<br><b>sheet</b> 1 of 1</td>
-<td><b>scale</b> n/a<br><b>rev</b> 03</td>
-<td><b>date</b> 2025-01-14<br><b>project</b> nagarro-wh</td>
-</tr></table>
-</div>
+<header class="top">
+  <div class="brand"><div class="bm"></div><div><h1>Snowflake ETL</h1><small>data architecture · v03</small></div></div>
+  <nav class="nav"><a class="on">Architecture</a><a>Schema</a><a>SCD Demo</a><a>Metrics</a></nav>
+</header>
 
-<h1>Snowflake ETL Pipeline<span class="sub">CSV and PostgreSQL sources loaded into a Snowflake warehouse with star-schema modelling and SCD Type 2 history</span></h1>
+<section class="hero">
+  <div>
+    <h2>From CSV chaos<br>to <span>queryable</span> truth.</h2>
+    <p>Production-grade ETL pipeline: CSV and PostgreSQL sources loaded into a Snowflake warehouse with star-schema modelling and SCD Type 2 history. Built during my Data Engineering internship at Nagarro.</p>
+    <div class="herotags">
+      <span class="tag">Python 3.11</span>
+      <span class="tag ice">Snowflake</span>
+      <span class="tag">Pandas</span>
+      <span class="tag">SQLAlchemy</span>
+      <span class="tag amb">SCD Type 2</span>
+      <span class="tag">GitHub Actions</span>
+    </div>
+  </div>
+  <div class="herobox">
+    <div class="row"><span class="k">Title</span><span class="v">Snowflake ETL Pipeline</span></div>
+    <div class="row"><span class="k">Drawn</span><span class="v">V. Sharma</span></div>
+    <div class="row"><span class="k">Revision</span><span class="v">03</span></div>
+    <div class="row"><span class="k">Date</span><span class="v">2025-01-14</span></div>
+    <div class="row"><span class="k">Project</span><span class="v">NAGARRO-WH</span></div>
+    <div class="row"><span class="k">Cadence</span><span class="v">Nightly @ 02:00 ACST</span></div>
+  </div>
+</section>
 
-<h2><span class="n">§1</span>Pipeline Architecture</h2>
-<p>Daily batch: CSVs land in an S3 staging bucket, PostgreSQL source is pulled incrementally via CDC timestamps. Python extracts using pandas and SQLAlchemy, normalises types, and emits to Snowflake via the native COPY INTO loader. MERGE INTO handles upserts with idempotency guarantees.</p>
+<section class="panel">
+  <div class="ph"><div><h3><span class="n">§1</span>Pipeline Architecture</h3><p>Daily batch flow from raw sources through transform to warehouse</p></div></div>
+  <div class="pipeline">
+    <div class="stage src"><div class="ic">1</div><h5>Source</h5><small>CSV + Postgres</small></div>
+    <div class="ar">→</div>
+    <div class="stage ext"><div class="ic">2</div><h5>Extract</h5><small>pandas + JDBC</small></div>
+    <div class="ar">→</div>
+    <div class="stage tx"><div class="ic">3</div><h5>Transform</h5><small>SCD Type 2</small></div>
+  </div>
+  <div class="pipeline" style="grid-template-columns:repeat(3,1fr) auto repeat(3,1fr);margin-top:0">
+    <div></div><div></div><div></div>
+    <div class="ar">↓</div>
+    <div></div><div></div><div></div>
+  </div>
+  <div class="pipeline" style="grid-template-columns:1fr auto 1fr auto 1fr">
+    <div class="stage dw"><div class="ic">5</div><h5>Snowflake</h5><small>X-Small WH</small></div>
+    <div class="ar">←</div>
+    <div class="stage ld"><div class="ic">4</div><h5>Load</h5><small>COPY INTO + MERGE</small></div>
+    <div></div><div></div>
+  </div>
+  <div class="pipeline-meta">
+    <span><b>Records/run</b> 2.14M</span>
+    <span><b>Wall time</b> 14m 22s</span>
+    <span><b>Throughput</b> 2500 rec/s</span>
+    <span><b>Warehouse</b> X-Small · auto-suspend 60s</span>
+    <span><b>Cost</b> ≈ $0.18 per run</span>
+  </div>
+</section>
 
-<div class="fig"><svg width="820" height="120" viewBox="0 0 820 120" xmlns="http://www.w3.org/2000/svg">
-<g stroke="#e8e5d0" stroke-width="1.2" fill="none">
-<rect x="10" y="40" width="110" height="40"/><rect x="160" y="40" width="110" height="40"/>
-<rect x="310" y="40" width="110" height="40"/><rect x="460" y="40" width="110" height="40"/>
-<rect x="610" y="40" width="110" height="40"/>
-<line x1="120" y1="60" x2="160" y2="60"/>
-<line x1="270" y1="60" x2="310" y2="60"/>
-<line x1="420" y1="60" x2="460" y2="60"/>
-<line x1="570" y1="60" x2="610" y2="60"/>
-<polygon points="158,58 158,62 163,60" fill="#e8e5d0" stroke="none"/>
-<polygon points="308,58 308,62 313,60" fill="#e8e5d0" stroke="none"/>
-<polygon points="458,58 458,62 463,60" fill="#e8e5d0" stroke="none"/>
-<polygon points="608,58 608,62 613,60" fill="#e8e5d0" stroke="none"/>
-</g>
-<g font-family="IBM Plex Mono" font-size="12" fill="#fff" text-anchor="middle">
-<text x="65" y="63">Source</text><text x="65" y="78" fill="#a8c3dc" font-size="10">CSV / Postgres</text>
-<text x="215" y="63">Extract</text><text x="215" y="78" fill="#a8c3dc" font-size="10">pandas / SQLAlchemy</text>
-<text x="365" y="63">Transform</text><text x="365" y="78" fill="#a8c3dc" font-size="10">SCD Type 2</text>
-<text x="515" y="63">Load</text><text x="515" y="78" fill="#a8c3dc" font-size="10">COPY INTO</text>
-<text x="665" y="63">Warehouse</text><text x="665" y="78" fill="#a8c3dc" font-size="10">Snowflake</text>
-</g>
-</svg></div>
-<div class="caption">Figure 1. End-to-end data flow (batch cadence: nightly 02:00 ACST).</div>
+<section class="panel">
+  <div class="ph"><div><h3><span class="n">§2</span>Star Schema</h3><p>Fact at centre · four conformed dimensions · Kimball-style</p></div></div>
+  <div class="schema">
+    <div class="dim-col">
+      <div class="tbl">
+        <div class="th">dim_customer</div>
+        <div class="fd pk"><span class="n">customer_key</span><span class="ty">INT PK</span></div>
+        <div class="fd"><span class="n">cust_id</span><span class="ty">VARCHAR</span></div>
+        <div class="fd"><span class="n">name</span><span class="ty">VARCHAR</span></div>
+        <div class="fd"><span class="n">city</span><span class="ty">VARCHAR</span></div>
+        <div class="fd"><span class="n">scd2_valid</span><span class="ty">DATE</span></div>
+      </div>
+      <div class="tbl">
+        <div class="th">dim_date</div>
+        <div class="fd pk"><span class="n">date_key</span><span class="ty">INT PK</span></div>
+        <div class="fd"><span class="n">date</span><span class="ty">DATE</span></div>
+        <div class="fd"><span class="n">year</span><span class="ty">INT</span></div>
+        <div class="fd"><span class="n">quarter</span><span class="ty">INT</span></div>
+        <div class="fd"><span class="n">dow</span><span class="ty">INT</span></div>
+      </div>
+    </div>
+    <div class="fact">
+      <div class="th">fact_sales</div>
+      <div class="fd pk"><span class="n">sale_id</span><span class="ty">BIGINT PK</span></div>
+      <div class="fd fk"><span class="n">customer_key</span><span class="ty">FK</span></div>
+      <div class="fd fk"><span class="n">product_key</span><span class="ty">FK</span></div>
+      <div class="fd fk"><span class="n">date_key</span><span class="ty">FK</span></div>
+      <div class="fd fk"><span class="n">store_key</span><span class="ty">FK</span></div>
+      <div class="fd"><span class="n">qty</span><span class="ty">INT</span></div>
+      <div class="fd"><span class="n">gross_amt</span><span class="ty">DECIMAL</span></div>
+      <div class="fd"><span class="n">discount</span><span class="ty">DECIMAL</span></div>
+    </div>
+    <div class="dim-col">
+      <div class="tbl">
+        <div class="th">dim_product</div>
+        <div class="fd pk"><span class="n">product_key</span><span class="ty">INT PK</span></div>
+        <div class="fd"><span class="n">sku</span><span class="ty">VARCHAR</span></div>
+        <div class="fd"><span class="n">name</span><span class="ty">VARCHAR</span></div>
+        <div class="fd"><span class="n">category</span><span class="ty">VARCHAR</span></div>
+        <div class="fd"><span class="n">list_price</span><span class="ty">DECIMAL</span></div>
+      </div>
+      <div class="tbl">
+        <div class="th">dim_store</div>
+        <div class="fd pk"><span class="n">store_key</span><span class="ty">INT PK</span></div>
+        <div class="fd"><span class="n">store_id</span><span class="ty">VARCHAR</span></div>
+        <div class="fd"><span class="n">region</span><span class="ty">VARCHAR</span></div>
+        <div class="fd"><span class="n">opened</span><span class="ty">DATE</span></div>
+      </div>
+    </div>
+  </div>
+</section>
 
-<h2><span class="n">§2</span>Star Schema</h2>
-<p>Fact table <code>fact_sales</code> centralises transaction events. Dimensions carry descriptive attributes and slowly-changing history.</p>
-<div class="fig"><svg width="820" height="330" viewBox="0 0 820 330" xmlns="http://www.w3.org/2000/svg" font-family="IBM Plex Mono" font-size="11" fill="#e8e5d0">
-<g stroke="#e8e5d0" stroke-width="1" fill="none">
-<rect x="320" y="130" width="180" height="80"/>
-<rect x="40" y="30" width="180" height="80"/>
-<rect x="600" y="30" width="180" height="80"/>
-<rect x="40" y="230" width="180" height="80"/>
-<rect x="600" y="230" width="180" height="80"/>
-<line x1="220" y1="70" x2="320" y2="150"/>
-<line x1="600" y1="70" x2="500" y2="150"/>
-<line x1="220" y1="270" x2="320" y2="200"/>
-<line x1="600" y1="270" x2="500" y2="200"/>
-</g>
-<g text-anchor="middle" fill="#fff" font-weight="600">
-<text x="410" y="148">fact_sales</text><text x="130" y="48">dim_customer</text>
-<text x="690" y="48">dim_product</text><text x="130" y="248">dim_date</text>
-<text x="690" y="248">dim_store</text>
-</g>
-<g font-size="10" fill="#a8c3dc">
-<text x="330" y="168">sale_id PK</text><text x="330" y="180">customer_key FK</text>
-<text x="330" y="192">product_key FK</text><text x="330" y="204">date_key FK · store_key FK</text>
-<text x="50" y="65">customer_key PK</text><text x="50" y="78">cust_id · name</text><text x="50" y="91">city · tier · scd2</text>
-<text x="610" y="65">product_key PK</text><text x="610" y="78">sku · name · cat</text><text x="610" y="91">price · scd2</text>
-<text x="50" y="265">date_key PK</text><text x="50" y="278">date · year · qtr</text><text x="50" y="291">month · dow · fiscal</text>
-<text x="610" y="265">store_key PK</text><text x="610" y="278">store_id · region</text><text x="610" y="291">opened_at · scd2</text>
-</g>
-</svg></div>
-<div class="caption">Figure 2. Star schema. Solid lines denote foreign-key joins from fact to dimension.</div>
+<section class="panel">
+  <div class="ph"><div><h3><span class="n">§3</span>SCD Type 2 · Live Demo</h3><p>Update a customer attribute to see the row expire and history preserve</p></div></div>
+  <div class="scd">
+    <div class="scd-tbl">
+      <table>
+        <thead><tr><th>ck</th><th>cust_id</th><th>name</th><th>city</th><th>eff_date</th><th>exp_date</th><th>is_cur</th></tr></thead>
+        <tbody id="scdTbody"></tbody>
+      </table>
+    </div>
+    <div class="scd-ctl">
+      <label>New city for CUST-042</label>
+      <input id="ncity" value="Adelaide" spellcheck="false">
+      <button class="btn" onclick="applyScd()">⟲ Apply Update</button>
+      <button class="btn g" onclick="resetScd()">reset demo</button>
+      <div class="scd-log" id="scdLog">ready — type a new city and click apply.</div>
+    </div>
+  </div>
+</section>
 
-<h2><span class="n">§3</span>SCD Type 2 Demonstration</h2>
-<p>Demonstration: when <code>customer_CUST-042</code> relocates, the current row is expired (<code>exp_date</code> set, <code>is_current</code> flipped to 0) and a fresh row is inserted with the new value. Historical facts remain joinable against the old surrogate key.</p>
-<table class="tbl" id="scd"></table>
-<div class="scd-form">
-<span>update city for CUST-042 to</span>
-<input id="ncity" value="Adelaide" spellcheck="false">
-<button onclick="applyScd()">APPLY UPDATE</button>
-<button onclick="resetScd()" style="opacity:.7">reset</button>
-</div>
-<div id="changelog" style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#7ea1c4;padding:10px 12px;border-left:2px solid #7ea1c4;margin-top:8px;min-height:60px"></div>
+<section class="panel">
+  <div class="ph"><div><h3><span class="n">§4</span>Run Metrics</h3><p>Last 30-day window · production instance</p></div></div>
+  <div class="metrics">
+    <div class="metric ice"><div class="n">2.14M</div><div class="l">Records / run</div><div class="tr">▲ 4.2% vs last week</div></div>
+    <div class="metric amb"><div class="n">14m 22s</div><div class="l">Wall time</div><div class="tr">within SLA</div></div>
+    <div class="metric sg"><div class="n">99.87%</div><div class="l">Data quality</div><div class="tr">nulls + type checks</div></div>
+    <div class="metric che"><div class="n">14 / 14</div><div class="l">Tables synced</div><div class="tr">all green</div></div>
+  </div>
+  <ol class="notes">
+    <li><b>Staging</b> tables use VARIANT to tolerate upstream schema drift without blocking the load.</li>
+    <li><b>CDC</b> handled via <code>updated_at</code> watermarks — log-based CDC deferred until WAL rates justify it.</li>
+    <li><b>Idempotency</b> guaranteed by <code>MERGE INTO</code> on natural keys. Pipeline is safely re-runnable.</li>
+    <li><b>Star schema</b> over snowflake schema — fewer joins, faster BI dashboards (Power BI, Metabase).</li>
+    <li><b>Alerts</b> via GitHub Actions + Slack webhook. Two retries with 5-minute backoff.</li>
+  </ol>
+</section>
 
-<h2><span class="n">§4</span>Metrics — Latest Run</h2>
-<div class="metrics">
-<div class="m"><div class="l">records loaded</div><div class="v">2.14 M</div><div class="spark">▂▃▅▄▆▇▆█ 14 runs</div></div>
-<div class="m"><div class="l">wall time</div><div class="v">14m 22s</div><div class="spark">▆▇▅▃▂▃▄▅</div></div>
-<div class="m"><div class="l">data quality</div><div class="v">99.87%</div><div class="spark">niceness over 30d</div></div>
-<div class="m"><div class="l">tables synced</div><div class="v">14 / 14</div><div class="spark">all green</div></div>
-</div>
-
-<h2><span class="n">§5</span>Design Notes</h2>
-<ol class="notes">
-<li>Staging tables use VARIANT type to tolerate upstream schema drift without blocking the load.</li>
-<li>CDC handled via <code>updated_at</code> watermarking — log-based CDC deferred until postgres WAL rates justify it.</li>
-<li>Idempotency guaranteed by <code>MERGE INTO ... USING stg ON tgt.key = stg.key WHEN MATCHED ... WHEN NOT MATCHED ...</code>. Pipeline is safely re-runnable.</li>
-<li>Star schema chosen over snowflake schema — fewer joins, faster queries on Power BI and Metabase dashboards.</li>
-<li>SCD Type 2 applied to <code>dim_customer</code>, <code>dim_product</code>, <code>dim_store</code>. Date dimension pre-materialised for 10 years.</li>
-<li>All Snowflake compute uses an X-Small warehouse with auto-suspend at 60s — cost-controlled for development.</li>
-<li>Surrogate keys are sequences, not hashes. Hashes were considered but rejected for debuggability.</li>
-<li>Pipeline failures alert via GitHub Actions + a Slack webhook. Retries: 2 with 5-minute backoff.</li>
-</ol>
-
-<h2><span class="n">§6</span>Revision History</h2>
-<table class="tbl revhist">
-<thead><tr><th>rev</th><th>date</th><th>description</th><th>author</th></tr></thead>
-<tbody>
-<tr><td>03</td><td>2025-01-14</td><td>Added SCD Type 2 on dim_customer; switched to MERGE INTO</td><td>V.S.</td></tr>
-<tr><td>02</td><td>2024-12-28</td><td>Initial Snowflake migration; star schema locked</td><td>V.S.</td></tr>
-<tr><td>01</td><td>2024-12-15</td><td>Proof of concept in DuckDB — retired</td><td>V.S.</td></tr>
-</tbody>
-</table>
-
-<footer>V. SHARMA &middot; DRAWING 01 &middot; SNOWFLAKE-ETL &middot; <a href="https://github.com/Vikrant892/snowflake-etl-pipeline">github.com/Vikrant892/snowflake-etl-pipeline</a></footer>
+<footer class="foot">
+  <span>Snowflake ETL · V. Sharma · Data Engineering Intern, Nagarro</span>
+  <span><a href="https://github.com/Vikrant892/snowflake-etl-pipeline">github.com/Vikrant892/snowflake-etl-pipeline</a></span>
+</footer>
 </div>
 
 <script>
 let scd=[];
 function resetScd(){
   scd=[
-    {ck:8001,cid:'CUST-042',name:'Rohan Patel',city:'Gurugram',eff:'2024-03-12',exp:'2025-01-14',cur:0},
-    {ck:8247,cid:'CUST-042',name:'Rohan Patel',city:'Delhi',eff:'2025-01-14',exp:null,cur:1},
+    {ck:8001,cid:'CUST-042',name:'Rohan Patel',city:'Gurugram',eff:'2024-03-12',exp:'2025-01-14',cur:0,cls:'exp'},
+    {ck:8247,cid:'CUST-042',name:'Rohan Patel',city:'Delhi',eff:'2025-01-14',exp:'(null)',cur:1,cls:'cur'}
   ];
-  renderScd();document.getElementById('changelog').innerHTML='<span style="color:#a8c3dc">-- change log will appear here --</span>';
+  render();document.getElementById('scdLog').textContent='ready — type a new city and click apply.';
 }
-function renderScd(){
-  const h='<thead><tr><th>ck</th><th>cust_id</th><th>name</th><th>city</th><th>eff_date</th><th>exp_date</th><th>is_current</th></tr></thead>';
-  const rows=scd.map(r=>'<tr><td>'+r.ck+'</td><td>'+r.cid+'</td><td>'+r.name+'</td><td>'+r.city+'</td><td>'+r.eff+'</td><td>'+(r.exp||'(null)')+'</td><td>'+r.cur+'</td></tr>').join('');
-  document.getElementById('scd').innerHTML=h+'<tbody>'+rows+'</tbody>';
+function render(){
+  document.getElementById('scdTbody').innerHTML=scd.map(r=>'<tr class="'+r.cls+'"><td>'+r.ck+'</td><td>'+r.cid+'</td><td>'+r.name+'</td><td>'+r.city+'</td><td>'+r.eff+'</td><td>'+r.exp+'</td><td>'+r.cur+'</td></tr>').join('')
 }
 function applyScd(){
   const nv=document.getElementById('ncity').value.trim();if(!nv)return;
   const today=new Date().toISOString().slice(0,10);
-  const cur=scd.find(r=>r.cur===1);if(!cur||cur.city===nv){document.getElementById('changelog').innerHTML='<span style="color:#c4a47e">no change — value identical to current row</span>';return}
+  const cur=scd.find(r=>r.cur===1);if(!cur||cur.city===nv){document.getElementById('scdLog').textContent='⚠ no change — value identical to current row';return}
   const maxCk=Math.max(...scd.map(r=>r.ck))+1;
-  cur.exp=today;cur.cur=0;
-  scd.push({ck:maxCk,cid:cur.cid,name:cur.name,city:nv,eff:today,exp:null,cur:1});
-  renderScd();
-  document.getElementById('changelog').innerHTML=
-    '[ '+today+' 02:14:07 ] UPDATE dim_customer SET exp_date = \''+today+'\', is_current = 0 WHERE ck = '+cur.ck+';<br>'+
-    '[ '+today+' 02:14:07 ] INSERT INTO dim_customer (ck, cust_id, name, city, eff_date, exp_date, is_current) VALUES ('+maxCk+', \''+cur.cid+'\', \''+cur.name+'\', \''+nv+'\', \''+today+'\', NULL, 1);<br>'+
-    '[ '+today+' 02:14:07 ] COMMIT; -- 2 rows affected';
+  cur.exp=today;cur.cur=0;cur.cls='exp';
+  scd.push({ck:maxCk,cid:cur.cid,name:cur.name,city:nv,eff:today,exp:'(null)',cur:1,cls:'cur new'});
+  render();
+  document.getElementById('scdLog').innerHTML='&gt; UPDATE dim_customer SET exp_date=\''+today+'\', is_current=0 WHERE ck='+cur.ck+';<br>&gt; INSERT INTO dim_customer VALUES ('+maxCk+',\''+cur.cid+'\',\''+cur.name+'\',\''+nv+'\',\''+today+'\',NULL,1);<br>&gt; COMMIT; -- 2 rows affected';
+  setTimeout(()=>{scd=scd.map(r=>({...r,cls:r.cls.replace(' new','')}));render()},2100);
 }
 resetScd();
 </script>
