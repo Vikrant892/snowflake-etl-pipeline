@@ -1,6 +1,6 @@
 # Snowflake ETL Pipeline
 
-Built this during my time at Nagarro to standardise our data loading into Snowflake. We had CSV dumps and Postgres databases scattered everywhere, and analysts were manually importing stuff into Snowflake through the web UI. This pipeline automates the whole thing — extraction, cleaning, deduplication, and loading with proper star schema modelling.
+A production-style ETL pipeline that standardises data loading from CSV files and Postgres databases into Snowflake. Built as a personal project to replace manual UI-based imports with an automated workflow covering extraction, cleaning, deduplication, and proper dimensional modelling.
 
 ## Architecture
 
