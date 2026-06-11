@@ -24,7 +24,7 @@ env/
 .env
 .env.local
 
-# Data files — don't commit raw data
+# Data files - don't commit raw data
 data/
 *.csv
 *.parquet

@@ -9,7 +9,7 @@ def log(msg):
 def clean_column_names(df):
     """Lowercase, strip whitespace, replace spaces with underscores.
     You'd be surprised how many source systems have columns like
-    '  Customer Name  ' or 'ORDER ID' — learned this the hard way at Nagarro.
+    '  Customer Name  ' or 'ORDER ID' - learned this the hard way at Nagarro.
     """
     df = df.copy()
     df.columns = [col.strip().lower().replace(" ", "_") for col in df.columns]
@@ -42,7 +42,7 @@ def handle_nulls(df, strategy="drop", fill_values=None):
                 df[col] = df[col].fillna(val)
         log(f"Filled nulls using provided values")
     else:
-        # default — fill numeric with 0, strings with 'UNKNOWN'
+        # default - fill numeric with 0, strings with 'UNKNOWN'
         for col in df.columns:
             if df[col].dtype in ["float64", "int64"]:
                 df[col] = df[col].fillna(0)
@@ -183,7 +183,7 @@ def apply_scd_type2(existing_df, incoming_df, key_columns, tracked_columns):
 
 
 def validate_dataframe(df, required_columns, name="dataframe"):
-    """Basic validation — check required columns exist and df isn't empty."""
+    """Basic validation - check required columns exist and df isn't empty."""
     if df is None or len(df) == 0:
         raise ValueError(f"{name} is empty")
 
