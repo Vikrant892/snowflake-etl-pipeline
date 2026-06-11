@@ -22,7 +22,7 @@ def _validate_identifier(name):
 
 def get_connection():
     """Get snowflake connection.
-    Snowflake connector is picky about None values in the config dict —
+    Snowflake connector is picky about None values in the config dict -
     it throws these cryptic errors if you pass None for optional fields.
     """
     # filter out None values before connecting
@@ -91,7 +91,7 @@ def put_and_copy(conn, df, stage_table):
 
         # PUT file to stage
         # the file:// prefix is required on all platforms
-        # on windows you need forward slashes — snowflake connector is picky about this
+        # on windows you need forward slashes - snowflake connector is picky about this
         put_path = tmp_file.replace("\\", "/")
         put_sql = f"PUT 'file://{put_path}' {stage_name} AUTO_COMPRESS=TRUE"
         cur.execute(put_sql)

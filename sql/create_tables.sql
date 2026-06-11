@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS DIM_PRODUCT (
     brand                VARCHAR(100),
     unit_price           FLOAT,
     unit_cost            FLOAT,
-    -- not doing SCD on products for now, just overwrite
+    -- products are overwritten on each load (no slowly-changing-dimension history)
     last_updated         TIMESTAMP DEFAULT CURRENT_TIMESTAMP()
 );
 

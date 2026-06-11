@@ -70,7 +70,7 @@ def _validate_table_name(table_name):
 
 
 def extract_postgres_table(table_name, where_clause=None):
-    """Convenience wrapper — most of the time we just want the whole table.
+    """Convenience wrapper - most of the time we just want the whole table.
     Be careful with big tables though, no LIMIT here on purpose because
     we usually want everything for the warehouse.
     """

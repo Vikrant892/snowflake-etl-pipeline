@@ -6,7 +6,7 @@
 -- NULL CHECKS
 -- ============================================
 
--- Check for null business keys — these should never be null
+-- Check for null business keys - these should never be null
 SELECT 'DIM_CUSTOMER' as table_name, 'customer_id' as column_name,
        COUNT(*) as null_count
 FROM DIM_CUSTOMER
@@ -39,7 +39,7 @@ WHERE is_current = TRUE
 GROUP BY customer_id
 HAVING COUNT(*) > 1;
 
--- Duplicate orders — shouldn't happen
+-- Duplicate orders - shouldn't happen
 SELECT order_id, COUNT(*) as duplicate_count
 FROM FACT_SALES
 GROUP BY order_id
@@ -96,7 +96,7 @@ FROM FACT_SALES;
 -- ============================================
 -- ROW COUNT SUMMARY
 -- ============================================
--- quick sanity check — if counts drop dramatically something is wrong
+-- quick sanity check - if counts drop dramatically something is wrong
 
 SELECT 'DIM_CUSTOMER' as table_name, COUNT(*) as row_count FROM DIM_CUSTOMER
 UNION ALL

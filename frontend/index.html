@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Snowflake ETL — Data Architecture</title>
+<title>Snowflake ETL - Data Architecture</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -256,7 +256,7 @@ html,body{background:var(--bg);color:var(--ink);font-family:'DM Sans',system-ui,
       <input id="ncity" value="Adelaide" spellcheck="false">
       <button class="btn" onclick="applyScd()">⟲ Apply Update</button>
       <button class="btn g" onclick="resetScd()">reset demo</button>
-      <div class="scd-log" id="scdLog">ready — type a new city and click apply.</div>
+      <div class="scd-log" id="scdLog">ready - type a new city and click apply.</div>
     </div>
   </div>
 </section>
@@ -271,9 +271,9 @@ html,body{background:var(--bg);color:var(--ink);font-family:'DM Sans',system-ui,
   </div>
   <ol class="notes">
     <li><b>Staging</b> tables use VARIANT to tolerate upstream schema drift without blocking the load.</li>
-    <li><b>CDC</b> handled via <code>updated_at</code> watermarks — log-based CDC deferred until WAL rates justify it.</li>
+    <li><b>CDC</b> handled via <code>updated_at</code> watermarks - log-based CDC deferred until WAL rates justify it.</li>
     <li><b>Idempotency</b> guaranteed by <code>MERGE INTO</code> on natural keys. Pipeline is safely re-runnable.</li>
-    <li><b>Star schema</b> over snowflake schema — fewer joins, faster BI dashboards (Power BI, Metabase).</li>
+    <li><b>Star schema</b> over snowflake schema - fewer joins, faster BI dashboards (Power BI, Metabase).</li>
     <li><b>Alerts</b> via GitHub Actions + Slack webhook. Two retries with 5-minute backoff.</li>
   </ol>
 </section>
@@ -291,7 +291,7 @@ function resetScd(){
     {ck:8001,cid:'CUST-042',name:'Rohan Patel',city:'Gurugram',eff:'2024-03-12',exp:'2025-01-14',cur:0,cls:'exp'},
     {ck:8247,cid:'CUST-042',name:'Rohan Patel',city:'Delhi',eff:'2025-01-14',exp:'(null)',cur:1,cls:'cur'}
   ];
-  render();document.getElementById('scdLog').textContent='ready — type a new city and click apply.';
+  render();document.getElementById('scdLog').textContent='ready - type a new city and click apply.';
 }
 function render(){
   document.getElementById('scdTbody').innerHTML=scd.map(r=>'<tr class="'+r.cls+'"><td>'+r.ck+'</td><td>'+r.cid+'</td><td>'+r.name+'</td><td>'+r.city+'</td><td>'+r.eff+'</td><td>'+r.exp+'</td><td>'+r.cur+'</td></tr>').join('')
@@ -299,7 +299,7 @@ function render(){
 function applyScd(){
   const nv=document.getElementById('ncity').value.trim();if(!nv)return;
   const today=new Date().toISOString().slice(0,10);
-  const cur=scd.find(r=>r.cur===1);if(!cur||cur.city===nv){document.getElementById('scdLog').textContent='⚠ no change — value identical to current row';return}
+  const cur=scd.find(r=>r.cur===1);if(!cur||cur.city===nv){document.getElementById('scdLog').textContent='⚠ no change - value identical to current row';return}
   const maxCk=Math.max(...scd.map(r=>r.ck))+1;
   cur.exp=today;cur.cur=0;cur.cls='exp';
   scd.push({ck:maxCk,cid:cur.cid,name:cur.name,city:nv,eff:today,exp:'(null)',cur:1,cls:'cur new'});
